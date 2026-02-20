@@ -5,7 +5,7 @@ const addProduct=(req,res)=>{
     if(!title || !price || !description || !imageUrl){
         return res.status(400).json({message:'All fields are required'});
     }   
-    const product=new Products(title,price,description,imageUrl);
+    const product=new Products(title,price,description,imageUrl,null,req.user._id);
     product.save()
     .then(result=>{
         res.status(201).json({message:'Product added successfully',product:result});
