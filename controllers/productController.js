@@ -87,7 +87,60 @@ const deleteProduct=(req,res)=>{
         res.status(500).json({message:'Failed to delete product'});
     });
 };
-module.exports={addProduct,fetchAllProducts,findProductById,updateProduct,deleteProduct};
+const addToCart=(req,res)=>{
+    const productId=req.params.id;  
+    if(!productId){
+        return res.status(400).json({message:'Product ID is required'});
+    }   
+    Products.findById(productId)
+    .then(product=>{
+        if(!product){   
+            return res.status(404).json({message:'Product not found'});
+        }
+        return req.user.addToCart(product);
+    })
+    .then(result=>{
+        res.status(200).json({message:'Product added to cart successfully'});
+    })
+    .catch(err=>{
+        console.log(err);
+        res.status(500).json({message:'Failed to add product to cart'});
+    });
+};
+const getCart=async(req,res)=>{
+    try{
+        const user=await req.user.populate('cart.items.productId');     
+        console.log("cart",user.cart);
+        const cartItems=user.cart.items.map(item=>{
+            return {    
+                product:item.productId,
+                quantity:item.quantity
+            };
+        }
+        );
+        res.status(200).json({cartItems});
+    }
+    catch(err)
+    {
+        console.log(err);
+        res.status(500).json({message:'Failed to fetch cart items'});
+    }
+};
+const deleteFromCart=(req,res)=>{
+    const productId=req.params.id;
+    if(!productId){
+        return res.status(400).json({message:'Product ID is required'});
+    }   
+    req.user.deleteItemFromCart(productId)
+    .then(result=>{
+        res.status(200).json({message:'Product removed from cart successfully'});
+    })
+    .catch(err=>{
+        console.log(err);
+        res.status(500).json({message:'Failed to remove product from cart'});
+    });
+};
+module.exports={addProduct,fetchAllProducts,findProductById,updateProduct,deleteProduct,addToCart,getCart,deleteFromCart};
 /*
 const Products=require('../models/product');
 const addProduct=(req,res)=>{

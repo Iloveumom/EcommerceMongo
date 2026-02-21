@@ -9,9 +9,9 @@ router.get('/fetch/:id',findProductById);
 router.put('/update/:id',updateProduct);
 router.delete('/delete/:id',deleteProduct);
 
-// router.post('/add-to-cart/:id',addToCart);
-// router.delete('/delete-from-cart/:id',deleteFromCart);
-// router.get('/cart',getCart);
+ router.post('/add-to-cart/:id',addToCart);
+ router.delete('/delete-from-cart/:id',deleteFromCart);
+ router.get('/cart',getCart);
 
 
 // router.post('/add-order',postOrder);
