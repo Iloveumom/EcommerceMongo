@@ -122,5 +122,31 @@ const getCart=(req,res)=>{
         res.status(500).json({message:'Failed to fetch cart items'});
     });
 };
+
+const postOrder=(req,res)=>{
+    console.log("h koi",req.user);
+    req.user.addOrder()
+    .then(result=>{ 
+        res.status(200).json({message:'Order placed successfully'});
+    }
+    )
+    .catch(err=>{
+        console.log(err);
+        res.status(500).json({message:'Failed to place order'});
+    });     
+};
+const getOrders=(req,res)=>{
+    req.user.getOrders()
+    .then(orders=>{ 
+        res.status(200).json({orders});
+    }
+    )
+    .catch(err=>{
+        console.log(err);
+        res.status(500).json({message:'Failed to fetch orders'});
+    }); 
+};
+
 module.exports={addProduct,fetchAllProducts,
-    findProductById,updateProduct,deleteProduct,addToCart,deleteFromCart,getCart};
+    findProductById,updateProduct,deleteProduct,
+    addToCart,deleteFromCart,getCart,postOrder,getOrders};

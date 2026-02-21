@@ -60,8 +60,10 @@ class User
         return i.productId;
         }   
         );
+        console.log("ids",productIds);
         return db.collection('products').find({ _id: { $in: productIds } }).toArray()
         .then(products => {
+            console.log("getCart",products);
         return products.map(p => {
             return {
             ...p,
@@ -75,7 +77,7 @@ class User
         ).catch(err => {
         console.log(err);
         }        );             
-        
+
     }   
     deleteItemFromCart(productId)
     {
@@ -88,6 +90,40 @@ class User
         { $set: { cart: { items: updatedCartItems } } }
         );
     }   
+    addOrder()
+    {
+        //we dont need to add order collection as we can fetch orders from user collection itself
+        const db = getDb(); 
+       return this.getCart()
+        .then(products => { 
+          console.log("pro",products);
+            const order = {                     
+                items: products,      
+            user: {
+                _id: new mongodb.ObjectId(this._id),
+                username: this.username
+            }
+            };
+            return db.collection('orders').insertOne(order) 
+                .then(result => {
+                
+                                this.cart = { items: [] };
+                                return db.collection('users').updateOne(
+                            { _id: new mongodb.ObjectId(this._id) },
+                            { $set: { cart: { items: [] } } }
+                            );
+                })
+                .catch(err => 
+                {
+                console.log(err);         
+                });
+                })
+    }
+    getOrders()
+    {
+        const db = getDb();
+        return db.collection('orders').find({ 'user._id': new mongodb.ObjectId(this._id) }).toArray();
+    }
 
 }
 module.exports=User;
