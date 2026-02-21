@@ -67,7 +67,25 @@ const updateProduct=(req,res)=>{
         res.status(500).json({message:'Failed to update product'});
     });
 };
-module.exports={addProduct,fetchAllProducts,findProductById,updateProduct};
+const deleteProduct=(req,res)=>{
+    const productId=req.params.id;
+    //validation can be added here
+    if(!productId){ 
+        return res.status(400).json({message:'Product ID is required'});
+    }
+    Products.findByIdAndDelete(productId)
+    .then(result=>{
+        if(!result){    
+            return res.status(404).json({message:'Product not found'});
+        }
+        res.status(200).json({message:'Product deleted successfully'});
+    })
+    .catch(err=>{
+        console.log(err);
+        res.status(500).json({message:'Failed to delete product'});
+    });
+};
+module.exports={addProduct,fetchAllProducts,findProductById,updateProduct,deleteProduct};
 /*
 const Products=require('../models/product');
 const addProduct=(req,res)=>{
