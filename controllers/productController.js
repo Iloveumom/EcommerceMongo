@@ -5,7 +5,7 @@ const addProduct=(req,res)=>{
     if(!title || !price || !description || !imageUrl){
         return res.status(400).json({message:'All fields are required'});
     }   
-    const product=new Products({title:title,price:price,description:description,imageUrl:imageUrl});
+    const product=new Products({title:title,price:price,description:description,imageUrl:imageUrl,userId:req.user._id});
     product.save()
     .then(result=>{
         res.status(201).json({message:'Product added successfully',product:result});
@@ -17,6 +17,8 @@ const addProduct=(req,res)=>{
 };
 const fetchAllProducts=(req,res)=>{
     Products.find()
+    .select('title price description imageUrl userId')
+    .populate('userId','username email')
     .then(products=>{
         res.status(200).json({products});
     })
