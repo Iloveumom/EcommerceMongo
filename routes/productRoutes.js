@@ -12,8 +12,6 @@ router.delete('/delete/:id',deleteProduct);
  router.post('/add-to-cart/:id',addToCart);
  router.delete('/delete-from-cart/:id',deleteFromCart);
  router.get('/cart',getCart);
-
-
-// router.post('/add-order',postOrder);
-// router.get('/orders',getOrders);
+router.post('/add-order',postOrder);
+ router.get('/orders',getOrders);
 module.exports=router;

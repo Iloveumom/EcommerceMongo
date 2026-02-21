@@ -1,4 +1,5 @@
 const Products=require('../models/product');
+const Orders=require('../models/order');
 const addProduct=(req,res)=>{
    //validation can be added here
     const {title,price,description,imageUrl}=req.body;
@@ -140,7 +141,48 @@ const deleteFromCart=(req,res)=>{
         res.status(500).json({message:'Failed to remove product from cart'});
     });
 };
-module.exports={addProduct,fetchAllProducts,findProductById,updateProduct,deleteProduct,addToCart,getCart,deleteFromCart};
+const postOrder=async(req,res)=>{
+    try{
+        const user=await req.user.populate('cart.items.productId');
+        const orderItems=user.cart.items.map(item=>{
+            return {    
+                product:{...item.productId._doc},
+                quantity:item.quantity
+            };
+        });
+        const order=new Orders({
+            products:orderItems,
+            user:{
+                userId:req.user._id,
+                username:req.user.username,
+                email:req.user.email,
+            }
+        });
+        await order.save();
+
+        req.user.cart={items:[]};
+        await req.user.save();
+        res.status(200).json({message:'Order placed successfully'});
+    }
+    catch(err){
+        console.log(err);
+        res.status(500).json({message:'Failed to place order'});
+    }   
+};
+const getOrders=(req,res)=>{
+    Orders.find({'user.userId':req.user._id})
+    .then(orders=>{ 
+        res.status(200).json({orders});
+    }
+    )
+    .catch(err=>{
+        console.log(err);
+        res.status(500).json({message:'Failed to fetch orders'});
+    }); 
+};
+
+module.exports={addProduct,fetchAllProducts,findProductById,updateProduct
+    ,deleteProduct,addToCart,getCart,deleteFromCart,postOrder,getOrders};
 /*
 const Products=require('../models/product');
 const addProduct=(req,res)=>{
