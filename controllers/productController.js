@@ -5,6 +5,77 @@ const addProduct=(req,res)=>{
     if(!title || !price || !description || !imageUrl){
         return res.status(400).json({message:'All fields are required'});
     }   
+    const product=new Products({title:title,price:price,description:description,imageUrl:imageUrl});
+    product.save()
+    .then(result=>{
+        res.status(201).json({message:'Product added successfully',product:result});
+    })
+    .catch(err=>{
+        console.log(err);
+        res.status(500).json({message:'Failed to add product'});
+    });
+};
+const fetchAllProducts=(req,res)=>{
+    Products.find()
+    .then(products=>{
+        res.status(200).json({products});
+    })
+    .catch(err=>{
+        console.log(err);
+
+        res.status(500).json({message:'Failed to fetch products'});
+    }
+    );
+};
+const findProductById=(req,res)=>{
+    const productId=req.params.id;
+    //validation can be added here
+    if(!productId){
+        return res.status(400).json({message:'Product ID is required'});
+    }   
+    Products.findById(productId)
+    .then(product=>{
+        if(!product){   
+            return res.status(404).json({message:'Product not found'});
+        }
+        res.status(200).json({product});
+    })
+    .catch(err=>{
+        console.log(err);
+        res.status(500).json({message:'Failed to fetch product'});
+    }       
+    );
+};
+const updateProduct=(req,res)=>{
+    const productId=req.params.id;
+    if(!productId){
+        return res.status(400).json({message:'Product ID is required'});
+    }   
+    const {title,price,description,imageUrl}=req.body;
+    if(!title || !price || !description || !imageUrl){
+        return res.status(400).json({message:'All fields are required'});
+    }
+    Products.findByIdAndUpdate(productId,{title,price,description,imageUrl},{new:true})
+    .then(result=>{
+        if(!result){
+            return res.status(404).json({message:'Product not found'});
+        }
+        res.status(200).json({message:'Product updated successfully',product:result});
+    })
+    .catch(err=>{
+        console.log(err);
+        res.status(500).json({message:'Failed to update product'});
+    });
+};
+module.exports={addProduct,fetchAllProducts,findProductById,updateProduct};
+/*
+const Products=require('../models/product');
+const addProduct=(req,res)=>{
+   //validation can be added here
+    const {title,price,description,imageUrl}=req.body;
+    if(!title || !price || !description || !imageUrl){
+        return res.status(400).json({message:'All fields are required'});
+    }   
     const product=new Products(title,price,description,imageUrl,null,req.user._id);
     product.save()
     .then(result=>{
@@ -150,3 +221,4 @@ const getOrders=(req,res)=>{
 module.exports={addProduct,fetchAllProducts,
     findProductById,updateProduct,deleteProduct,
     addToCart,deleteFromCart,getCart,postOrder,getOrders};
+*/
