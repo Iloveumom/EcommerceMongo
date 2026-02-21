@@ -9,10 +9,13 @@ const User=require('./models/user');
 
 const app=express();    
 app.use(express.json());
+
 app.use((req,res,next)=>{
-    User.findById('6998a8dd58c561a902bd2aa6')
+    User.findById('6998c2cf58c561a902bd2ac9')
     .then(user=>{
-    req.user=user;          
+  //  console.log(user.username,user.email,user.cart,user._id);  
+    req.user=new User(user.username,user.email,user.cart,user._id);          
+  //  console.log(req.user);
     next();
 }).catch(err=>{
     console.log(err);
